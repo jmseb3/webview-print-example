@@ -1,9 +1,8 @@
 package com.wonddak.print
 
 import android.app.Application
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
+import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,6 +26,7 @@ class AndroidApp : Application() {
 class AppActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WebView.setWebContentsDebuggingEnabled(true)
         enableEdgeToEdge()
         setContent { App() }
     }
@@ -36,7 +36,16 @@ class AppActivity : ComponentActivity() {
 actual fun WebView(modifier: Modifier) {
     val context = LocalContext.current
     AndroidView(
-        factory = { android.webkit.WebView(context).apply { webViewClient = WebViewClient() } },
+        factory = {
+            WebView(context).apply {
+                with(settings) {
+                    javaScriptEnabled = true
+                }
+                webViewClient = object : WebViewClient() {
+
+                }
+            }
+        },
         modifier = Modifier.then(modifier),
         update = { it.loadUrl(BundleAssetHelper.changeToLocalAddress("test.html")) }
     )
